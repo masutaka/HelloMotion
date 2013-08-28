@@ -1,16 +1,51 @@
 class AppDelegate
   def application(application, didFinishLaunchingWithOptions:launchOptions)
-    @window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
+    @window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.applicationFrame)
     @window.makeKeyAndVisible
 
-    controller = TapController.alloc.initWithNibName(nil, bundle: nil)
-    nav_controller = UINavigationController.alloc.initWithRootViewController(controller)
-    alphabet_controller = AlphabetController.alloc.initWithNibName(nil, bundle: nil)
+    # the points we're going to animate to
+    @points = [[0, 0], [50, 0], [0, 50], [50, 50]]
+    @current_index = 0
 
-    tab_controller = UITabBarController.alloc.initWithNibName(nil, bundle: nil)
-    tab_controller.viewControllers = [alphabet_controller, nav_controller]
-    @window.rootViewController = tab_controller
+    # usual method of adding views to our window
+    @view = UIView.alloc.initWithFrame [@points[@current_index], [100, 100]]
+    @view.backgroundColor = UIColor.blueColor
+    @window.addSubview(@view)
+
+#  animate_to_next_point
+   animate_to_next_point2
 
     true
+  end
+
+  def animate_to_next_point
+    @current_index += 1
+
+    # keep current_index in the range [0,3]
+    @current_index = @current_index % @points.count
+
+    UIView.animateWithDuration(0.3,
+                               animations: lambda {
+                                 @view.frame = [@points[@current_index], [100, 100]]
+                               },
+                               completion:lambda {|finished|
+                                 self.animate_to_next_point
+                               }
+                               )
+  end
+
+  def animate_to_next_point2
+    @current_index += 1
+    @current_index = @current_index % @points.count
+
+    UIView.animateWithDuration(2,
+                               delay: 1,
+                               options: UIViewAnimationOptionCurveLinear,
+#                              options: UIViewAnimationOptionRepeat,
+                               animations: lambda {
+                                 @view.frame = [@points[@current_index], [100, 100]]
+                               }, completion:lambda {|finished|
+                                 self.animate_to_next_point2
+                               })
   end
 end
